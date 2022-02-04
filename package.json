@@ -12,7 +12,8 @@
     "express": "^4.17.1",
     "node-fetch": "^2.6.1",
     "puppeteer": "^10.1.0",
-    "twilio": "^3.30.0"
+    "twilio": "^3.71.2",
+    "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#multidevice"
   },
   "devDependencies": {},
   "description": ""

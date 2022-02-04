@@ -3,7 +3,8 @@ const puppeteer = require('puppeteer');
 const os = require('os');
 const { exit } = require('process');
 const fetch = require('node-fetch');
-const HORA_INI_RANDOM = getHoraRandom(710, 724); // Default 701, 724
+const HORA_INI_RANDOM = getHoraRandom(630, 728); // Default 710, 724
+// const HORA_INI_RANDOM = getHoraRandom(610, 619);
 const USERS_JSON = {
   // @params [user, pass, celular, nombre]
   arl: ['1033780370', '1033780370', '573106542257', 'Arley'],
