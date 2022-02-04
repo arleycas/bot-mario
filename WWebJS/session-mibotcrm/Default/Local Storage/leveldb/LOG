@@ -1,6 +1,0 @@
-2022/02/04-06:25:04.328 5 Reusing MANIFEST /home/eyhsoncastro/PersonalRPA/Node/bot-mario/WWebJS/session-mibotcrm/Default/Local Storage/leveldb/MANIFEST-000001
-2022/02/04-06:25:04.329 5 Recovering log #4
-2022/02/04-06:25:04.450 5 Reusing old log /home/eyhsoncastro/PersonalRPA/Node/bot-mario/WWebJS/session-mibotcrm/Default/Local Storage/leveldb/000004.log 
-2022/02/04-09:47:05.372 c2 Level-0 table #8: started
-2022/02/04-09:47:05.421 c2 Level-0 table #8: 9358 bytes OK
-2022/02/04-09:47:05.450 c2 Delete type=0 #4
