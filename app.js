@@ -7,23 +7,22 @@ const HORA_INI_RANDOM = getHoraRandom(630, 728); // Default 710, 724
 // const HORA_INI_RANDOM = getHoraRandom(610, 619);
 const USERS_JSON = {
   // @params [user, pass, celular, nombre]
-  arl: ['1033780370', '1033780370', '573106542257', 'Arley'],
-  cam: ['1019134827', '1019134827', '573194447056', 'Camilo'],
-  die: ['1014238383', '!Qwerty28', '573003079207', 'Diego'],
-  elk: ['1007514490', '1007514490', '573134814366', 'Elkin'],
-  jua: ['1003479174', '1003479174', '573219906245', 'Juan'],
-  jul: ['1032507144', '1032507144', '573152909024', 'Julian'],
-  man: ['1018508863', '1018508863', '573137485133', 'Manuel'],
-  mar: ['1014302229', '1014302229', '573006870762', 'Mario'],
-  ste: ['1014296398', '1014296398', '573185303259', 'Stefanny'],
-  jut: ['1033801722', '1033801722', '573195155990', 'Julieth'],
+  arl: ['1033780370', '1033780370', '573106542257', 'Arley', 1289164086],
+  elk: ['1007514490', '1007514490', '573134814366', 'Elkin', 1236733025],
+  cam: ['1019134827', '1019134827', '573194447056', 'Camilo', 0],
+  die: ['1014238383', '!Qwerty28', '573003079207', 'Diego', 0],
+  jua: ['1003479174', '1003479174', '573219906245', 'Juan', 0],
+  jul: ['1032507144', '1032507144', '573152909024', 'Julian', 0],
+  man: ['1018508863', '1018508863', '573137485133', 'Manuel', 0],
+  mar: ['1014302229', '1014302229', '573006870762', 'Mario', 0],
+  ste: ['1014296398', '1014296398', '573185303259', 'Stefanny', 0],
+  jut: ['1033801722', '1033801722', '573195155990', 'Julieth', 0],
 };
-const DATA_LOGUEO = process.argv[2] === undefined ? 'arl' : process.argv[2]; //Si NO se manda el argumento inicia con mis datos
-const USER_CRM = USERS_JSON[DATA_LOGUEO][0];
-const PASS_CRM = USERS_JSON[DATA_LOGUEO][1];
-const TEL_WP = USERS_JSON[DATA_LOGUEO][2];
-const RUTA_CHROME_UBUNTU = '/usr/bin/google-chrome';
-const RUTA_CHROME_WINDOWS = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
+const DATA_LOGUEO = process.argv[2] === undefined ? 'arl' : process.argv[2], //Si NO se manda el argumento inicia con mis datos
+  USER_CRM = USERS_JSON[DATA_LOGUEO][0],
+  PASS_CRM = USERS_JSON[DATA_LOGUEO][1],
+  TEL_WP = USERS_JSON[DATA_LOGUEO][2],
+  TG_ID = USERS_JSON[DATA_LOGUEO][4];
 let isTarde = false;
 
 /* EJECUCIÓN FUNCIÓN PRINCIPAL */
@@ -78,13 +77,13 @@ function Main() {
 
 function getRutaChrome() {
   if (os.platform == 'linux') {
-    return RUTA_CHROME_UBUNTU;
+    return '/usr/bin/google-chrome';
   } else {
-    return RUTA_CHROME_WINDOWS;
+    return 'C:/Program Files/Google/Chrome/Application/chrome.exe';
   }
 }
 
-function enviarMsgWP(tel, msg) {
+function enviarMsgWP(tgid, msg) {
   /* Identifica el so para poder encontrar luego la IP local (ya que el servidor que se crea es local)*/
   // ! Si se usa wifi, se caga todo, el objeto de donde se encuentra la ip cambia
   // !  reformular como se obtiene la ip
@@ -100,10 +99,10 @@ function enviarMsgWP(tel, msg) {
 
   const networkInterfaces = os.networkInterfaces();
   const localip = networkInterfaces[param][index].address;
-  const bodyWP = { tel, msg };
+  const bodyWP = { tgid, msg };
 
   // Envia el mensaje por petición post
-  fetch(`http://${localip}:3001/wp/sendMessage`, {
+  fetch(`http://${localip}:3001/tg/sendMessage`, {
     method: 'post',
     body: JSON.stringify(bodyWP),
     headers: { 'Content-Type': 'application/json' },
@@ -140,7 +139,7 @@ function runBot(accionBot, horaAccion) {
     let isDisabledBtnCIU = await page.evaluate(() => document.querySelector('#m11 > div.icono-modulo > img').classList.contains('modulo_disabled'));
 
     if (isDisabledBtnCIU) {
-      await enviarMsgWP(TEL_WP, `🤖🔔 Ya te habías deslogueado hoy *${NOMBRE_USER} - ${USER_CRM}*`);
+      if (TG_ID !== 0) await enviarMsgWP(TG_ID, `🤖🔔 Ya te habías deslogueado hoy *${NOMBRE_USER} - ${USER_CRM}*`);
     } else {
       await page.waitForSelector('.iframe_sitio');
 
@@ -164,7 +163,7 @@ function runBot(accionBot, horaAccion) {
 
         if (isDiabledBtnIni == true && isDiabledBtnFin == false) {
           const HORA_LOG_CRM = await page.evaluate(() => document.querySelector('label#txt_state1').innerText); // ? - Hora de logueo que aparece en la pagina del CRM
-          await enviarMsgWP(TEL_WP, `🤖🔔 Ya te habías logueado a las ${HORA_LOG_CRM} *${NOMBRE_USER} - ${USER_CRM}*`);
+          if (TG_ID !== 0) await enviarMsgWP(TG_ID, `🤖🔔 Ya te habías logueado a las ${HORA_LOG_CRM} *${NOMBRE_USER} - ${USER_CRM}*`);
         } else {
           await page.click('button#turno_ini'); //btn iniciar turno
 
@@ -173,11 +172,9 @@ function runBot(accionBot, horaAccion) {
           const HORA_LOG_CRM = await page.evaluate(() => document.querySelector('label#txt_state1').innerText); // ? - Hora de logueo que aparece en la pagina del CRM
 
           if (isTarde) {
-            await enviarMsgWP(TEL_WP, `🤖✅⚠️ Login tarde a las ${HORA_LOG_CRM} para el usuario *${NOMBRE_USER} - ${USER_CRM}*`);
-            // await enviarMsgWP(TEL_WP, `🤖✅⚠️ Login tarde a las ${horaAccion} para el usuario *${NOMBRE_USER} - ${USER_CRM}*`)
+            if (TG_ID !== 0) await enviarMsgWP(TG_ID, `🤖✅⚠️ Login tarde a las ${HORA_LOG_CRM} para el usuario *${NOMBRE_USER} - ${USER_CRM}*`);
           } else {
-            await enviarMsgWP(TEL_WP, `🤖✅ Login a las ${HORA_LOG_CRM} para el usuario *${NOMBRE_USER} - ${USER_CRM}*`);
-            // await enviarMsgWP(TEL_WP, `🤖✅ Login a las ${HORA_INI_RANDOM.strVersion} para el usuario *${NOMBRE_USER} - ${USER_CRM}*`)
+            if (TG_ID !== 0) await enviarMsgWP(TG_ID, `🤖✅ Login a las ${HORA_LOG_CRM} para el usuario *${NOMBRE_USER} - ${USER_CRM}*`);
           }
         }
       } else if (accionBot === 'logout') {
@@ -193,9 +190,9 @@ function runBot(accionBot, horaAccion) {
         isDisabledBtnCIU = await page.evaluate(() => document.querySelector('#m11 > div.icono-modulo > img').classList.contains('modulo_disabled'));
 
         if (isDisabledBtnCIU) {
-          await enviarMsgWP(TEL_WP, `🤖👋 Logout a las ${horaAccion} para el usuario *${NOMBRE_USER} - ${USER_CRM}*`);
+          if (TG_ID !== 0) await enviarMsgWP(TG_ID, `🤖👋 Logout a las ${horaAccion} para el usuario *${NOMBRE_USER} - ${USER_CRM}*`);
         } else {
-          await enviarMsgWP(TEL_WP, `🤖⚠️ Al parecer NO se pudo hacer Logout para el usuario *${NOMBRE_USER} - ${USER_CRM}* (revisar manualmente => http://appmaster.groupcos.com/appmaster/?crm=11&CIU)`);
+          if (TG_ID !== 0) await enviarMsgWP(TG_ID, `🤖⚠️ Al parecer NO se pudo hacer Logout para el usuario *${NOMBRE_USER} - ${USER_CRM}* (revisar manualmente => http://appmaster.groupcos.com/appmaster/?crm=11&CIU)`);
         }
       } else {
         console.log('>>> ❌ No se le envió ninguna acción al robot');
